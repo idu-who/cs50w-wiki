@@ -7,4 +7,5 @@ urlpatterns = [
     path("search/", views.search, name="search"),
     path("search-results/<str:query>/", views.search_results, name="search_results"),
     path("wiki/<str:title>/", views.entry, name="entry"),
+    path("create-page/", views.create_entry, name="create_entry"),
 ]

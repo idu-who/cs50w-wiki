@@ -1,3 +1,5 @@
+from django import forms
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.decorators.http import require_POST
@@ -50,3 +52,44 @@ def entry(request, title):
 
     context["content"] = content
     return render(request, "encyclopedia/entry.html", context)
+
+
+def validate_unique_title(title):
+    if title in util.list_entries():
+        raise ValidationError(
+            f'Entry with title "{title}" already exists.'
+        )
+
+
+class CreateEntryForm(forms.Form):
+    title = forms.CharField(
+        label="Title",
+        required=True,
+        validators=[validate_unique_title]
+    )
+    content = forms.CharField(label="Content", widget=forms.Textarea())
+
+
+def create_entry(request):
+
+    if request.method == "POST":
+        form = CreateEntryForm(request.POST)
+
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            content = form.cleaned_data["content"]
+
+            util.save_entry(title, content)
+
+            return HttpResponseRedirect(reverse(
+                "entry",
+                kwargs={"title": title}
+            ))
+        else:
+            return render(request, "encyclopedia/create_entry.html", {
+                "form": form
+            })
+
+    return render(request, "encyclopedia/create_entry.html", {
+        "form": CreateEntryForm()
+    })
