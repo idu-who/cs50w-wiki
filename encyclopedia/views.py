@@ -8,3 +8,15 @@ def index(request):
         "entries": util.list_entries()
     })
 
+
+def entry(request, title):
+    context = {
+        "title": title
+    }
+
+    content = util.get_entry(title)
+    if not content:
+        return render(request, "encyclopedia/error.html", context)
+
+    context["content"] = content
+    return render(request, "encyclopedia/entry.html", context)
