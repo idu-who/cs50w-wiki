@@ -37,7 +37,7 @@ def search_results(request, query):
 
     return render(request, "encyclopedia/search_results.html", {
         "query": query,
-        "results": results,
+        "results": results
     })
 
 
@@ -92,4 +92,34 @@ def create_entry(request):
 
     return render(request, "encyclopedia/create_entry.html", {
         "form": CreateEntryForm()
+    })
+
+
+class EditEntryForm(forms.Form):
+    content = forms.CharField(label="Content", widget=forms.Textarea())
+
+
+def edit_entry(request, title):
+
+    if request.method == "POST":
+        form = EditEntryForm(request.POST)
+
+        if form.is_valid():
+            content = form.cleaned_data["content"]
+
+            util.save_entry(title, content)
+
+            return HttpResponseRedirect(reverse(
+                "entry",
+                kwargs={"title": title}
+            ))
+        else:
+            return render(request, "encyclopedia/edit_entry.html", {
+                "title": title,
+                "form": form
+            })
+
+    return render(request, "encyclopedia/edit_entry.html", {
+        "title": title,
+        "form": EditEntryForm({"content": util.get_entry(title)})
     })
