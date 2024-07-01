@@ -1,4 +1,5 @@
 from random import choice as random_choice
+from markdown2 import Markdown
 
 
 from django import forms
@@ -9,6 +10,8 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from . import util
+
+markdowner = Markdown()
 
 
 def index(request):
@@ -60,7 +63,7 @@ def entry(request, title):
     if not content:
         return render(request, "encyclopedia/error.html", context)
 
-    context["content"] = content
+    context["content"] = markdowner.convert(content)
     return render(request, "encyclopedia/entry.html", context)
 
 
