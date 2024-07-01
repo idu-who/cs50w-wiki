@@ -1,9 +1,12 @@
+from random import choice as random_choice
+
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
-from django.shortcuts import render
 
 from . import util
 
@@ -39,6 +42,13 @@ def search_results(request, query):
         "query": query,
         "results": results
     })
+
+
+def random_entry(request):
+    random_title = random_choice(util.list_entries())
+    return HttpResponseRedirect(reverse("entry", kwargs={
+        "title": random_title
+    }))
 
 
 def entry(request, title):
